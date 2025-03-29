@@ -1,39 +1,22 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Depends
 from pydantic import BaseModel
+from app.core.database import engine, SessionLocal, Base
+from typing import Annotated
+from sqlalchemy.orm import Session
+import app.models
+from app.api.routes import router 
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-class Item(BaseModel):
-    text: str = None
-    is_done: bool = False
+db_dependency = Annotated[Session, Depends(get_db)]
 
-
-items = []
-
-
-@app.get("/")
-def root():
-    return {"Hello": "World"}
-
-
-@app.post("/items")
-def create_item(item: Item):
-    items.append(item)
-    return items
-
-@app.get("/items", response_model=list[Item])
-def list_items(limit: int = 10):
-    return items[0:limit]
-
-# @app.get("/items/{item_id}")
-# async def get_item(item_id: int):
-#     item = items[item_id]
-#     return item
-
-@app.get("/items/{item_id}", response_model=Item)
-async def get_item(item_id: int) -> Item:
-    if item_id < len(items):
-        return items[item_id]
-    else:
-        raise HTTPException(status_code=404, detail=f"Item {item_id} not found")
+app.include_router(router)
