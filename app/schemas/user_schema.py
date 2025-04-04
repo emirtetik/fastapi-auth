@@ -1,20 +1,11 @@
-import uuid
 from pydantic import BaseModel, EmailStr
-from typing import Optional
 
-class UserCreate(BaseModel):
-    username: str
+class CreateUserRequest(BaseModel):
+    first_name: str
+    last_name: str
     email: EmailStr
     password: str
-
-class UserResponse(BaseModel):
-    id: uuid.UUID
-    username: str
-    email: EmailStr
-
-    class Config:
-        orm_mode = True
-
-class UserLogin(BaseModel):
+    
+class LoginUserRequest(BaseModel):
     email: EmailStr
     password: str

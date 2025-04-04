@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-router = APIRouter(prefix="", tags=["main"])
+router = APIRouter(prefix="", tags=["Main"])
 
 @router.get("/")
 def main():
