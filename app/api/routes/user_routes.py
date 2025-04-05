@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.user_schema import CreateUserRequest, LoginUserRequest
 from app.services.user_service import create_user_account, login_user
+from app.responses.user_response import UserRegisterResponse, UserLoginResponse
 
 router = APIRouter(
     prefix="/users",
@@ -10,7 +11,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-@router.post('/register', status_code=status.HTTP_201_CREATED)
+@router.post('/register', status_code=status.HTTP_201_CREATED,  response_model=UserRegisterResponse)
 async def create_user(data: CreateUserRequest, db: Session = Depends(get_db)):
     new_user = await create_user_account(data, db)
 
@@ -23,6 +24,6 @@ async def create_user(data: CreateUserRequest, db: Session = Depends(get_db)):
     }
 
     
-@router.post('/login', status_code=status.HTTP_200_OK)
+@router.post('/login', status_code=status.HTTP_200_OK,  response_model=UserLoginResponse)
 async def login(data: LoginUserRequest, db: Session = Depends(get_db)):
     return await login_user(data, db)

@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 from app.models.user_model import UserModel
 from app.schemas.user_schema import CreateUserRequest
-from app.core.security import verify_password
+from app.core.security import verify_password, create_access_token
 
 class UserRepository:
     @staticmethod
@@ -28,4 +28,6 @@ class UserRepository:
         user = UserRepository.get_user_by_email(db, email)
         if not user or not verify_password(password, user.password):
             return None
-        return user
+        access_token = create_access_token(data={"sub": user.email})
+    
+        return user, access_token

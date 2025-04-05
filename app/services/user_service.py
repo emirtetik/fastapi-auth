@@ -13,14 +13,18 @@ async def create_user_account(data: CreateUserRequest, db: Session):
     return new_user 
 
 async def login_user(data, db: Session):
-    user = UserRepository.authenticate_user(db, data.email, data.password)
+    user, access_token = UserRepository.authenticate_user(db, data.email, data.password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
     return {
-        "id": user.id,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "email": user.email,
-        "registered_at": user.registered_at
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "registered_at": user.registered_at
+        }
     }
